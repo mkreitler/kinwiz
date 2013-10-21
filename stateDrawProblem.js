@@ -11,13 +11,15 @@ ig.module(
 
 StateDrawProblem = ig.Class.extend({
 	
-  TOOLBAR_GROUP_ID: 1,
+  MODEBAR_GROUP_ID: 1,
   COLORBAR_GROUP_ID: 2,
+  TOOLBAR_GROUP_ID: 3,
 
 	// Load a font
 	font: null,
   modeBoxes: null, 
   colorBoxes: null,
+  toolBoxes: null,
 
   subState: null,
   drawRegion: null,
@@ -32,9 +34,9 @@ StateDrawProblem = ig.Class.extend({
     this.drawRegion = new joe.MathEx.AABB(100, 10, 1024 - 110, Math.round(768 / 2 - 20));
 
     this.modeBoxes = [
-      new joe.GUI.ToggleBox(10, 10, 75, 75, "#00ffff", "#007777", this.toggleLineMode.bind(this), this.TOOLBAR_GROUP_ID, this.lineModeDraw),
-      new joe.GUI.ToggleBox(10, 95, 75, 75, "#00ffff", "#007777", this.toggleVectorMode.bind(this), this.TOOLBAR_GROUP_ID, this.vectorModeDraw),
-      new joe.GUI.ToggleBox(10, 180, 75, 75, "#00ffff", "#007777", this.toggleArcMode.bind(this), this.TOOLBAR_GROUP_ID, this.arcModeDraw)
+      new joe.GUI.ToggleBox(10, 10, 75, 75, "#00ffff", "#007777", this.toggleLineMode.bind(this), this.MODEBAR_GROUP_ID, this.lineModeDraw),
+      new joe.GUI.ToggleBox(10, 95, 75, 75, "#00ffff", "#007777", this.toggleVectorMode.bind(this), this.MODEBAR_GROUP_ID, this.vectorModeDraw),
+      new joe.GUI.ToggleBox(10, 180, 75, 75, "#00ffff", "#007777", this.toggleArcMode.bind(this), this.MODEBAR_GROUP_ID, this.arcModeDraw)
     ];
 
     this.colorBoxes = [
@@ -44,12 +46,20 @@ StateDrawProblem = ig.Class.extend({
       new joe.GUI.ToggleBox(50, 305, 32, 32, "#ff0000", "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
     ];
 
+    this.toolBoxes = [
+      new joe.GUI.ToggleBox(10, 350, 75, 75, "#ff0000", "#770000", this.toggleLineMode.bind(this), this.TOOLBAR_GROUP_ID, this.deleteToolDraw),
+    ];
+
     for (i=0; i<this.modeBoxes.length; ++i) {
       joe.GUI.addWidget(this.modeBoxes[i]);
     }
 
     for (i=0; i<this.colorBoxes.length; ++i) {
       joe.GUI.addWidget(this.colorBoxes[i]);
+    }
+
+    for (i=0; i<this.toolBoxes.length; ++i) {
+      joe.GUI.addWidget(this.toolBoxes[i]);
     }
 
     this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", 30, 102, 12);
@@ -88,6 +98,10 @@ StateDrawProblem = ig.Class.extend({
   // Toggle Button Custom Draw Routines ///////////////////////////////////////
   // (will be executed in the context of the appropriate ToggleBox object)
   // //////////////////////////////////////////////////////////////////////////
+  deleteToolDraw: function(context, worldX, worldY) {
+
+  },
+  
   colorButtonDraw: function(context, worldX, worldY) {
     var bounds = this.AABBgetRef();
 
