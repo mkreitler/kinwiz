@@ -20,6 +20,7 @@ StateDrawProblem = ig.Class.extend({
   modeBoxes: null, 
   colorBoxes: null,
   toolBoxes: null,
+  diagramBox: null,
 
   subState: null,
   drawRegion: null,
@@ -63,8 +64,22 @@ StateDrawProblem = ig.Class.extend({
     }
 
     this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", 30, 102, 12);
-    joe.GUI.addWidget(this.labelDiagram);
+    this.diagramBox = new joe.GUI.CaptureBox(100, 10, 1024 - 110, Math.round(768 / 2 - 20), "#ffffff", "#777777", this.diagramClick.bind(this), this.diagramDraw, {label: this.labelDiagram});
+    this.diagramBox.widgetAddChild(this.labelDiagram);
+    joe.GUI.addWidget(this.diagramBox);
 	},
+
+  diagramClick: function() {
+
+  },
+
+  diagramDraw: function(context, worldX, worldY) {
+    this.AABBdraw(context, this.isOn() ? this.onColor : this.offColor);
+
+    if (this.customData && !this.isOn()) {
+      this.customData.label.draw(context, worldX + this.bounds.x, worldY + this.bounds.y);
+    }
+  },
 
   // Toggle Button Callbacks //////////////////////////////////////////////////
   toggleLineMode: function() {
@@ -303,9 +318,6 @@ StateDrawProblem = ig.Class.extend({
   draw: function() {
     var context = joe.Graphics.getActiveContext();
 
-    if (this.drawRegion) {
-      this.drawRegion.AABBdraw(context, "#444444");
-    }
     joe.GUI.draw(context);
     // this.font.draw(joe.Graphics.getActiveContext(), "State Draw Problems", 100, 50, "#00FF00", null, "50px");
   }
