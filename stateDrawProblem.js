@@ -47,7 +47,7 @@ StateDrawProblem = ig.Class.extend({
     ];
 
     this.toolBoxes = [
-      new joe.GUI.ToggleBox(10, 350, 75, 75, "#ff0000", "#770000", this.toggleLineMode.bind(this), this.TOOLBAR_GROUP_ID, this.deleteToolDraw),
+      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", "#ff0000", this.toggleLineMode.bind(this), this.deleteToolDraw),
     ];
 
     for (i=0; i<this.modeBoxes.length; ++i) {
@@ -99,7 +99,25 @@ StateDrawProblem = ig.Class.extend({
   // (will be executed in the context of the appropriate ToggleBox object)
   // //////////////////////////////////////////////////////////////////////////
   deleteToolDraw: function(context, worldX, worldY) {
+    var bounds = this.AABBgetRef();
 
+    var dx = Math.round(bounds.width * 0.5);
+    var dy = Math.round(bounds.height * 0.5);
+    var x0 = Math.round((bounds.width - dx) * 0.5);
+    var y0 = Math.round((bounds.height - dx) * 0.5);
+
+    context.save();
+    context.translate(bounds.x + worldX + x0, bounds.y + worldY + y0);
+    context.lineWidth = 2;
+
+    context.beginPath();
+    context.moveTo(0, 0);
+    context.lineTo(dx, dy);
+    context.moveTo(0, dy);
+    context.lineTo(dy, 0);
+    context.stroke();
+
+    context.restore();
   },
   
   colorButtonDraw: function(context, worldX, worldY) {
