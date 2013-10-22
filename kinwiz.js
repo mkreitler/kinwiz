@@ -90,8 +90,8 @@ KinWizMain = ig.Game.extend({
     // Initialize your game here; bind keys etc.
     this.setFocus();
 
-    joe.KeyInput.addListener(this);
-    joe.MouseInput.addListener(this);
+    joe.KeyInput.addListener(joe.GUI);
+    joe.MouseInput.addListener(joe.GUI);
 
     joe.UpdateLoop.start(true);
 
@@ -139,25 +139,6 @@ KinWizMain = ig.Game.extend({
     // Deprecated.
   },
   
-  mouseUp: function(x, y) {
-    return this.curState ? this.curState.mouseUp(x, y) : false;
-  },
-  mouseDown: function(x, y) {
-    return this.curState ? this.curState.mouseDown(x, y) : false;
-  },
-  mouseClick: function(x, y) {
-    return this.curState ? this.curState.mouseClick(x, y) : false;
-  },
-  mouseDoubleClick: function(x, y) {
-    return this.curState ? this.curState.mouseDoubleClick(x, y) : false;
-  },
-  mouseDrag: function(x, y) {
-    return this.curState ? this.curState.mouseDrag(x, y) : false;
-  },
-  mouseHold: function(x, y) {
-    return this.curState ? this.curState.mouseHold(x, y) : false;
-  },
-
   // mouseClickKW: function(x, y) {
   //  var screenDivisionWidth = ig.system.width / 3;
   //  var sector = parseInt(x / screenDivisionWidth);

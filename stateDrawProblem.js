@@ -64,14 +64,10 @@ StateDrawProblem = ig.Class.extend({
     }
 
     this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", 30, 102, 12);
-    this.diagramBox = new joe.GUI.CaptureBox(100, 10, 1024 - 110, Math.round(768 / 2 - 20), "#ffffff", "#777777", this.diagramClick.bind(this), this.diagramDraw, {label: this.labelDiagram});
+    this.diagramBox = new joe.GUI.CaptureBox(100, 10, 1024 - 110, Math.round(768 / 2 - 20), "#ffffff", "#777777", this, this.diagramDraw);
     this.diagramBox.widgetAddChild(this.labelDiagram);
     joe.GUI.addWidget(this.diagramBox);
 	},
-
-  diagramClick: function() {
-
-  },
 
   diagramDraw: function(context, worldX, worldY) {
     this.AABBdraw(context, this.isOn() ? this.onColor : this.offColor);
@@ -258,31 +254,38 @@ StateDrawProblem = ig.Class.extend({
   // Input Event Handlers
   /////////////////////////////////////////////////////////////////////////////
   mouseUp: function(x, y) {
-    return joe.GUI.mouseUp(x, y);
+    console.log("Captured mouseUp.");
+    return true;
   },
 
   mouseDown: function(x, y) {
-    return joe.GUI.mouseDown(x, y);
+    console.log("Captured mouseDown.");
+    return true;
   },
 
   mouseDrag: function(x, y) {
-    return joe.GUI.mouseDrag(x, y);
+    console.log("Captured mouseDrag.");
+    return true;
   },
 
   mouseOver: function(x, y) {
-    return joe.GUI.mouseOver(x, y);
+    console.log("Captured mouseOver.");
+    return true;
   },
 
   mouseHold: function(x, y) {
-    return joe.GUI.mouseHold(x, y);
+    console.log("Captured mouseHold.");
+    return true;
   },
 
   mouseClick: function(x, y) {
-    return joe.GUI.mouseClick(x, y);
+    console.log("Captured mouseClick.");
+    return true;
   },
 
   mouseDoubleClick: function(x, y) {
-    return joe.GUI.mouseDoubleClick(x, y);
+    console.log("Captured mouseDoubleClick.");
+    return true;
   },
 
 	// mouseClickKW: function(x, y) {
