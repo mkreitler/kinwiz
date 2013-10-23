@@ -5,18 +5,24 @@ ig.module(
 	'impact.game',
 	'impact.font',
 
-	'shared.kinWizLib.algebra2'
+  // 'shared.kinWizLib.algebra2',
+  'games.kinwiz.state'
 )
 .defines(function(){
 
-StateDrawProblem = ig.Class.extend({
+StateDrawProblem = state.extend({
 	
   MODEBAR_GROUP_ID: 1,
   COLORBAR_GROUP_ID: 2,
   TOOLBAR_GROUP_ID: 3,
 
-	// Load a font
+  DRAW_COLOR_RED: "#ff0000",
+  DRAW_COLOR_GREEN: "#00ff00",
+  DRAW_COLOR_YELLOW: "#ffff00",
+  DRAW_COLOR_BLUE: "#4444ff",
+
 	font: null,
+
   modeBoxes: null, 
   colorBoxes: null,
   toolBoxes: null,
@@ -30,6 +36,13 @@ StateDrawProblem = ig.Class.extend({
 	init: function(sysFont) {
     var i = 0;
 
+    // Initialize code modules ------------------------------------------------
+    // Inherited...
+    this.parent();
+
+    // ...and local.
+    this.loadModule(kw.drawProblemGUIhandlers);
+
     this.font = sysFont;
 
     this.drawRegion = new joe.MathEx.AABB(100, 10, 1024 - 110, Math.round(768 / 2 - 20));
@@ -41,14 +54,14 @@ StateDrawProblem = ig.Class.extend({
     ];
 
     this.colorBoxes = [
-      new joe.GUI.ToggleBox(10, 265, 32, 32, "#4444ff", "#222277", this.toggleColorBlue.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 265, 32, 32, "#00ff00", "#007700", this.toggleColorGreen.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(10, 305, 32, 32, "#ffff00", "#777700", this.toggleColorYellow.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 305, 32, 32, "#ff0000", "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 265, 32, 32, this.DRAW_COLOR_BLUE, "#222277", this.toggleColorBlue.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 265, 32, 32, this.DRAW_COLOR_GREEN, "#007700", this.toggleColorGreen.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 305, 32, 32, this.DRAW_COLOR_YELLOW, "#777700", this.toggleColorYellow.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 305, 32, 32, this.DRAW_COLOR_RED, "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
     ];
 
     this.toolBoxes = [
-      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", "#ff0000", this.toggleLineMode.bind(this), this.deleteToolDraw),
+      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", this.DRAW_COLOR_RED, this.toggleLineMode.bind(this), this.deleteToolDraw),
     ];
 
     for (i=0; i<this.modeBoxes.length; ++i) {
@@ -69,270 +82,6 @@ StateDrawProblem = ig.Class.extend({
     joe.GUI.addWidget(this.diagramBox);
 	},
 
-  // Capture Box Callbacks ////////////////////////////////////////////////////
-  // Executes in the CaptureBox context
-  diagramDraw: function(context, worldX, worldY) {
-    this.AABBdraw(context, this.isOn() ? this.onColor : this.offColor);
-
-    if (this.customData && !this.isOn()) {
-      this.customData.label.draw(context, worldX + this.bounds.x, worldY + this.bounds.y);
-    }
-  },
-
-  // Toggle Button Callbacks //////////////////////////////////////////////////
-  toggleLineMode: function() {
-
-  },
-
-  toggleVectorMode: function() {
-
-  },
-
-  toggleArcMode: function() {
-
-  },
-
-  toggleColorBlue: function() {
-
-  },
-
-  toggleColorGreen: function() {
-
-  },
-
-  toggleColorYellow: function() {
-
-  },
-
-  toggleColorRed: function() {
-
-  },
-
-  // Toggle Button Custom Draw Routines ///////////////////////////////////////
-  // (will be executed in the context of the appropriate ToggleBox object)
-  // //////////////////////////////////////////////////////////////////////////
-  deleteToolDraw: function(context, worldX, worldY) {
-    var bounds = this.AABBgetRef();
-
-    var dx = Math.round(bounds.width * 0.5);
-    var dy = Math.round(bounds.height * 0.5);
-    var x0 = Math.round((bounds.width - dx) * 0.5);
-    var y0 = Math.round((bounds.height - dx) * 0.5);
-
-    context.save();
-    context.translate(bounds.x + worldX + x0, bounds.y + worldY + y0);
-    context.lineWidth = 2;
-
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(dx, dy);
-    context.moveTo(0, dy);
-    context.lineTo(dy, 0);
-    context.stroke();
-
-    context.restore();
-  },
-  
-  colorButtonDraw: function(context, worldX, worldY) {
-    var bounds = this.AABBgetRef();
-
-    context.save();
-    context.translate(worldX + bounds.x, worldY + bounds.y);
-
-    if (this.isOn()) {
-      context.lineWidth = 2;
-      context.strokeStyle = "#ffffff";
-    }
-
-    context.beginPath();
-    context.moveTo(0, 0);
-    context.lineTo(bounds.width, 0);
-    context.lineTo(bounds.width, bounds.height);
-    context.lineTo(0, bounds.height);
-    context.closePath();
-    context.fill();
-
-    if (this.isOn()) {
-      context.stroke();
-    }
-
-    context.restore();
-  },
-
-  lineModeDraw: function(context, worldX, worldY) {
-    var bounds = this.AABBgetRef(),
-        lw = 2,
-        w = Math.round(2 * bounds.width / 3),
-        h = Math.round(2 * bounds.height / 3),
-        x0 = Math.round((bounds.width - w) / 2 - lw / 2),
-        y0 = Math.round((bounds.height - h) / 2 - lw / 2);
-
-      context.save();
-      context.translate(worldX + bounds.x, worldY + bounds.y);
-      context.lineWidth = lw;
-
-      context.beginPath();
-      context.moveTo(x0, y0);
-      context.lineTo(x0, y0 + Math.round(h / 2));
-      context.lineTo(x0 + w, y0 + Math.round(h / 2));
-      context.lineTo(x0 + w, y0 + h);
-      context.stroke();
-
-      context.restore();
-  },
-
-  vectorModeDraw: function(context, worldX, worldY) {
-    var bounds = this.AABBgetRef(),
-        lw = 2,
-        w = Math.round(2 * bounds.width / 3),
-        h = Math.round(2 * bounds.height / 3),
-        x0 = Math.round((bounds.width - w) / 2 - lw / 2),
-        y0 = Math.round((bounds.height - h) / 2 - lw / 2),
-        ym = Math.round(y0 + h / 2);
-
-      context.save();
-      context.translate(worldX + bounds.x, worldY + bounds.y);
-      context.lineWidth = lw;
-
-      context.beginPath();
-      context.moveTo(x0, ym);
-      context.lineTo(x0 + w, ym);
-      context.lineTo(x0 + w - Math.round(w / 10), ym - Math.round(h / 10));
-      context.moveTo(x0 + w, ym);
-      context.lineTo(x0 + w - Math.round(w / 10), ym + Math.round(h / 10));
-      context.stroke();
-
-      context.restore();
-  },
-
-  arcModeDraw: function(context, worldX, worldY) {
-    var bounds = this.AABBgetRef(),
-        lw = 2,
-        w = Math.round(2 * bounds.width / 3),
-        h = Math.round(2 * bounds.height / 3),
-        x0 = Math.round((bounds.width - w) / 2 - lw / 2),
-        y0 = Math.round((bounds.height - h) / 2 - lw / 2),
-        xm = Math.round(x0 + w / 2),
-        x = 0,
-        a = 0.09,
-        pointsPerSide = 3,
-        i = 0,
-        y = function(x) { return Math.round(y0 + a * (x - xm) * (x - xm)); };
-
-      context.save();
-      context.translate(worldX + bounds.x, worldY + bounds.y);
-      context.lineWidth = lw;
-
-      context.beginPath();
-      for (i=-pointsPerSide; i<=pointsPerSide; ++i) {
-        x = Math.round(xm + i * w / (2 * pointsPerSide));
-        if (i === -pointsPerSide) {
-          context.moveTo(x, y(x));
-        }
-        else {
-          context.lineTo(x, y(x));
-        }
-      }
-      context.stroke();
-
-      context.restore();
-  },
-
-  /////////////////////////////////////////////////////////////////////////////
-  // State Processing
-  /////////////////////////////////////////////////////////////////////////////
-  enter: function() {
-
-  },
-
-  exit: function() {
-
-  },
-	
-	update: function() {
-	},
-
-  /////////////////////////////////////////////////////////////////////////////
-  // Input Event Handlers
-  /////////////////////////////////////////////////////////////////////////////
-  // --------------------------------------------------------------------------
-  // Default handlers:
-  defaultMouseUp: function(x, y) {
-    return true;
-  },
-
-  defaultMouseDown: function(x, y) {
-    return true;
-  },
-
-  defaultMouseDrag: function(x, y) {
-    return true;
-  },
-
-  defaultMouseOver: function(x, y) {
-    return true;
-  },
-
-  defaultMouseHold: function(x, y) {
-    return true;
-  },
-
-  defaultMouseClick: function(x, y) {
-    return true;
-  },
-
-  defaultMouseDoubleClick: function(x, y) {
-    return true;
-  },
-
-  resetMouseEvents: function() {
-    this.mouseUp = this.defaultMouseUp;
-    this.mouseDown = this.defaultMouseDown;
-    this.mouseDrag = this.defaultMouseDrag;
-    this.mouseOver = this.defaultMouseOver;
-    this.mouseClick = this.defaultMouseClick;
-    this.mouseDoubleClick = this.defaultMouseDoubleClick;
-  },
-	
-  // --------------------------------------------------------------------------
-  // DrawParabola handlers:
-  DPmouseUp: function(x, y) {
-    return true;
-  },
-
-  DPmouseDown: function(x, y) {
-    return true;
-  },
-
-  DPmouseDrag: function(x, y) {
-    return true;
-  },
-
-  DPmouseOver: function(x, y) {
-    return true;
-  },
-
-  DPmouseHold: function(x, y) {
-    return true;
-  },
-
-  DPmouseClick: function(x, y) {
-    return true;
-  },
-
-  DPmouseDoubleClick: function(x, y) {
-    return true;
-  },
-
-  setDrawParabolaMouseEvents: function() {
-    this.mouseUp = this.DPmouseUp;
-    this.mouseDown = this.DPmouseDown;
-    this.mouseDrag = this.DPmouseDrag;
-    this.mouseOver = this.DPmouseOver;
-    this.mouseClick = this.DPmouseClick;
-    this.mouseDoubleClick = this.DPmouseDoubleClick;
-  },
-
 	// mouseClickKW: function(x, y) {
 	// 	var screenDivisionWidth = ig.system.width / 3;
 	// 	var sector = parseInt(x / screenDivisionWidth);
@@ -346,16 +95,16 @@ StateDrawProblem = ig.Class.extend({
 	// 	}
 	// },
 	
-  onAlgebra2start: function() {
-		this.startPointSlopeAnalysis();
-		this.parent();
-  },
+ //  onAlgebra2start: function() {
+	// 	this.startPointSlopeAnalysis();
+	// 	this.parent();
+ //  },
 		
- 	onAlgebra2stop: function(dataOut) {
-		this.parent();
-		this.stopAnalysis();
-		this.setFocus();
-	},
+ // 	onAlgebra2stop: function(dataOut) {
+	// 	this.parent();
+	// 	this.stopAnalysis();
+	// 	this.setFocus();
+	// },
 
   update: function(dt) {
     if (this.subState) {
@@ -364,10 +113,6 @@ StateDrawProblem = ig.Class.extend({
   },
 
   draw: function() {
-    var context = joe.Graphics.getActiveContext();
-
-    joe.GUI.draw(context);
-    // this.font.draw(joe.Graphics.getActiveContext(), "State Draw Problems", 100, 50, "#00FF00", null, "50px");
   }
 });
 

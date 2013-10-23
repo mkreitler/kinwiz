@@ -175,6 +175,8 @@ KinWizMain = ig.Game.extend({
   draw: function() {
     // Draw all entities and backgroundMaps
     this.parent();
+
+    joe.Graphics.render();
     
     if (this.isAlgebra2transitioning()) {
         this.drawAl2transition();
