@@ -5,7 +5,7 @@ ig.module(
   'impact.game',
   'impact.font',
 
-  'games.kinwiz.stateDrawProblem',
+  'games.kinwiz.stateDrawProblem.stateDrawProblem',
   'shared.kinWizLib.algebra2'
 )
 .defines(function(){
