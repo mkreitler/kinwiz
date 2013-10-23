@@ -5,6 +5,7 @@ ig.module(
   'impact.game',
   'impact.font',
 
+  'games.kinwiz.stateShowProblem.stateShowProblem',
   'games.kinwiz.stateDrawProblem.stateDrawProblem',
   'shared.kinWizLib.algebra2'
 )
@@ -83,7 +84,8 @@ KinWizMain = ig.Game.extend({
   loadFonts: function(font) {
     // TODO: update resource count.
     this.font = font;
-    this.setState(new StateDrawProblem(this.font));
+
+    this.setState(new StateShowProblem(new kw.problem(this.font, kw.DRAW_COLOR_LIGHT_BLUE, kw.strings.SAMPLE_PROBLEM_TEXT)));
   },
   
   init: function() {
@@ -97,7 +99,7 @@ KinWizMain = ig.Game.extend({
 
     joe.Graphics.setCanvas(ig.system.canvas);
 
-    joe.Resources.loader.loadFont("../fonts/pirulen.ttf",
+    joe.Resources.loader.loadFont("../fonts/BITSUMIS.TTF",
                                    this.loadFonts,
                                    function() { alert("Font load failed.") },
                                    this);
@@ -175,8 +177,6 @@ KinWizMain = ig.Game.extend({
   draw: function() {
     // Draw all entities and backgroundMaps
     this.parent();
-
-    joe.Graphics.render();
     
     if (this.isAlgebra2transitioning()) {
         this.drawAl2transition();
@@ -185,6 +185,8 @@ KinWizMain = ig.Game.extend({
     if (this.curState && !this.isAlgebra2active() && !this.isAlgebra2transitioning()) {   
       this.curState.draw();
     }
+
+    joe.Graphics.render();
   }
 
   // draw: function() {

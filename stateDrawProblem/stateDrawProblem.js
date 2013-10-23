@@ -16,11 +16,6 @@ StateDrawProblem = state.extend({
   COLORBAR_GROUP_ID: 2,
   TOOLBAR_GROUP_ID: 3,
 
-  DRAW_COLOR_RED: "#ff0000",
-  DRAW_COLOR_GREEN: "#00ff00",
-  DRAW_COLOR_YELLOW: "#ffff00",
-  DRAW_COLOR_BLUE: "#4444ff",
-
 	font: null,
 
   modeBoxes: null, 
@@ -45,7 +40,7 @@ StateDrawProblem = state.extend({
 
     this.font = sysFont;
 
-    this.drawRegion = new joe.MathEx.AABB(100, 10, 1024 - 110, Math.round(768 / 2 - 20));
+    this.drawRegion = new joe.MathEx.AABB(100, 10, kw.GAME_WIDTH - 110, Math.round(kw.GAME_HEIGHT / 2 - 20));
 
     this.modeBoxes = [
       new joe.GUI.ToggleBox(10, 10, 75, 75, "#00ffff", "#007777", this.toggleLineMode.bind(this), this.MODEBAR_GROUP_ID, this.lineModeDraw),
@@ -54,14 +49,14 @@ StateDrawProblem = state.extend({
     ];
 
     this.colorBoxes = [
-      new joe.GUI.ToggleBox(10, 265, 32, 32, this.DRAW_COLOR_BLUE, "#222277", this.toggleColorBlue.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 265, 32, 32, this.DRAW_COLOR_GREEN, "#007700", this.toggleColorGreen.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(10, 305, 32, 32, this.DRAW_COLOR_YELLOW, "#777700", this.toggleColorYellow.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 305, 32, 32, this.DRAW_COLOR_RED, "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 265, 32, 32, kw.DRAW_COLOR_BLUE, "#222277", this.toggleColorBlue.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 265, 32, 32, kw.DRAW_COLOR_GREEN, "#007700", this.toggleColorGreen.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 305, 32, 32, kw.DRAW_COLOR_YELLOW, "#777700", this.toggleColorYellow.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 305, 32, 32, kw.DRAW_COLOR_RED, "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
     ];
 
     this.toolBoxes = [
-      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", this.DRAW_COLOR_RED, this.toggleLineMode.bind(this), this.deleteToolDraw),
+      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, this.toggleLineMode.bind(this), this.deleteToolDraw),
     ];
 
     for (i=0; i<this.modeBoxes.length; ++i) {
@@ -77,7 +72,7 @@ StateDrawProblem = state.extend({
     }
 
     this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", 30, 102, 12);
-    this.diagramBox = new joe.GUI.CaptureBox(100, 10, 1024 - 110, Math.round(768 / 2 - 20), "#ffffff", "#777777", this, this.diagramDraw);
+    this.diagramBox = new joe.GUI.CaptureBox(100, 10, kw.GAME_WIDTH - 110, Math.round(kw.GAME_HEIGHT / 2 - 20), "#ffffff", "#777777", this, this.diagramDraw);
     this.diagramBox.widgetAddChild(this.labelDiagram);
     joe.GUI.addWidget(this.diagramBox);
 	},

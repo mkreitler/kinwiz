@@ -1,2 +1,12 @@
-var kw = {};
+var kw = {
+  GAME_WIDTH: 1024,
+  GAME_HEIGHT: 768,
+
+  DRAW_COLOR_RED: "#ff0000",
+  DRAW_COLOR_GREEN: "#00ff00",
+  DRAW_COLOR_YELLOW: "#ffff00",
+  DRAW_COLOR_BLUE: "#4444ff",
+  DRAW_COLOR_LIGHT_BLUE: "#6699ff",
+};
+
 
