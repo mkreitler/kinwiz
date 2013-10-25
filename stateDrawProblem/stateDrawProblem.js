@@ -27,9 +27,14 @@ StateDrawProblem = state.extend({
   drawRegion: null,
 
   labelDiagram: null,
+  instructions: [],
 
-	init: function(sysFont) {
-    var i = 0;
+	init: function(sysFont, instInputHandler) {
+    var boxX      = 0,
+        boxY      = 0,
+        boxDx     = 0,
+        boxDy     = 0,
+        i         = 0;
 
     // Initialize code modules ------------------------------------------------
     // Inherited...
@@ -37,27 +42,62 @@ StateDrawProblem = state.extend({
 
     // ...and local.
     this.loadModule(kw.drawProblemGUIhandlers);
+    this.defaultDiagramBoxInputHandler.mouseUp = this.startDrawing.bind(this);
 
     this.font = sysFont;
 
     this.drawRegion = new joe.MathEx.AABB(100, 10, kw.GAME_WIDTH - 110, Math.round(kw.GAME_HEIGHT / 2 - 20));
 
+    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
+      this.instructions.push(new joe.GUI.Label(kw.strings.DRAW_INSTRUCTIONS[i],
+                                               this.font,
+                                               kw.DRAW_COLOR_YELLOW,
+                                               kw.DEFAULT_TEXT_SIZE,
+                                               kw.GAME_WIDTH / 2,
+                                               kw.GAME_HEIGHT * 1 / 4 + kw.DEFAULT_TEXT_SIZE * (i - Math.round(kw.strings.DRAW_INSTRUCTIONS.length / 2)),
+                                               instInputHandler,
+                                               0.5,
+                                               0.5));
+    }
+
     this.modeBoxes = [
-      new joe.GUI.ToggleBox(10, 10, 75, 75, "#00ffff", "#007777", this.toggleLineMode.bind(this), this.MODEBAR_GROUP_ID, this.lineModeDraw),
-      new joe.GUI.ToggleBox(10, 95, 75, 75, "#00ffff", "#007777", this.toggleVectorMode.bind(this), this.MODEBAR_GROUP_ID, this.vectorModeDraw),
-      new joe.GUI.ToggleBox(10, 180, 75, 75, "#00ffff", "#007777", this.toggleArcMode.bind(this), this.MODEBAR_GROUP_ID, this.arcModeDraw)
+      new joe.GUI.ToggleBox(10, 10, 75, 75, "#00ffff", "#007777", this.MODEBAR_GROUP_ID, {mouseDown: this.toggleLineMode.bind(this)}, this.lineModeDraw),
+      new joe.GUI.ToggleBox(10, 95, 75, 75, "#00ffff", "#007777", this.MODEBAR_GROUP_ID, {mouseDown: this.toggleVectorMode.bind(this)}, this.vectorModeDraw),
+      new joe.GUI.ToggleBox(10, 180, 75, 75, "#00ffff", "#007777", this.MODEBAR_GROUP_ID, {mouseDown: this.toggleArcMode.bind(this)}, this.arcModeDraw)
     ];
 
     this.colorBoxes = [
-      new joe.GUI.ToggleBox(10, 265, 32, 32, kw.DRAW_COLOR_BLUE, "#222277", this.toggleColorBlue.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 265, 32, 32, kw.DRAW_COLOR_GREEN, "#007700", this.toggleColorGreen.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(10, 305, 32, 32, kw.DRAW_COLOR_YELLOW, "#777700", this.toggleColorYellow.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 305, 32, 32, kw.DRAW_COLOR_RED, "#770000", this.toggleColorRed.bind(this), this.COLORBAR_GROUP_ID, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 265, 32, 32, kw.DRAW_COLOR_BLUE, "#222277", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorBlue.bind(this)}, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 265, 32, 32, kw.DRAW_COLOR_GREEN, "#007700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorGreen.bind(this)}, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 305, 32, 32, kw.DRAW_COLOR_YELLOW, "#777700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorYellow.bind(this)}, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(50, 305, 32, 32, kw.DRAW_COLOR_RED, "#770000", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorRed.bind(this)}, this.colorButtonDraw),
     ];
 
     this.toolBoxes = [
-      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, this.toggleLineMode.bind(this), this.deleteToolDraw),
+      new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, {mouseUp: this.deleteElement.bind(this)}, this.deleteToolDraw),
     ];
+
+    boxDx = kw.GAME_WIDTH - 110;
+    boxDy = Math.round(kw.GAME_HEIGHT / 2 - 20);
+    boxX = 100;
+    boxY = kw.GAME_HEIGHT - 10 - boxDy;
+
+    this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", kw.DEFAULT_TEXT_SIZE, Math.round(boxDx * 0.5), Math.round(boxDy * 0.5), null, 0.5, 0.5);
+    this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.defaultDiagramBoxInputHandler, this.diagramDraw);
+    this.diagramBox.widgetAddChild(this.labelDiagram);
+	},
+
+  defaultDiagramBoxInputHandler:
+  {
+    mouseUp: null,
+  },
+
+  enter: function() {
+    var i = 0;
+
+    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
+      joe.GUI.addWidget(this.instructions[i]);
+    }
 
     for (i=0; i<this.modeBoxes.length; ++i) {
       joe.GUI.addWidget(this.modeBoxes[i]);
@@ -71,11 +111,30 @@ StateDrawProblem = state.extend({
       joe.GUI.addWidget(this.toolBoxes[i]);
     }
 
-    this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", 30, 102, 12);
-    this.diagramBox = new joe.GUI.CaptureBox(100, 10, kw.GAME_WIDTH - 110, Math.round(kw.GAME_HEIGHT / 2 - 20), "#ffffff", "#777777", this, this.diagramDraw);
-    this.diagramBox.widgetAddChild(this.labelDiagram);
     joe.GUI.addWidget(this.diagramBox);
-	},
+  },
+
+  exit: function() {
+    var i = 0;
+
+    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
+      joe.GUI.removeWidget(this.instructions[i]);
+    }
+
+    for (i=0; i<this.modeBoxes.length; ++i) {
+      joe.GUI.removeWidget(this.modeBoxes[i]);
+    }
+
+    for (i=0; i<this.colorBoxes.length; ++i) {
+      joe.GUI.removeWidget(this.colorBoxes[i]);
+    }
+
+    for (i=0; i<this.toolBoxes.length; ++i) {
+      joe.GUI.removeWidget(this.toolBoxes[i]);
+    }
+
+    joe.GUI.removeWidget(this.diagramBox);
+  },
 
 	// mouseClickKW: function(x, y) {
 	// 	var screenDivisionWidth = ig.system.width / 3;

@@ -13,39 +13,62 @@ kw.drawProblemGUIhandlers = {
     }
   },
 
+  // Draw Box Handlers ////////////////////////////////////////////////////////
+  startDrawing: function(x, y) {
+    this.diagramBox.widgetRemoveChild(this.labelDiagram);
+
+    // Set up normal draw input handler.
+    this.diagramBox.inputHandlers.mouseUp = this.continueDrawing.bind(this);
+    this.continueDrawing(x, y);
+
+    return true;
+  },
+
+  continueDrawing: function(x, y) {
+    console.log("Continue drawing...");
+
+    return true;
+  },
+
   // Toggle Button Callbacks //////////////////////////////////////////////////
   // These functions are executed in the context of the button.
-  toggleLineMode: function(whichButton) {
-
+  toggleLineMode: function(x, y) {
+    return true;
   },
 
-  toggleVectorMode: function(whichButton) {
-
+  toggleVectorMode: function(x, y) {
+    return true;
   },
 
-  toggleArcMode: function(whichButton) {
+  toggleArcMode: function(x, y) {
     if (whichButton && whichButton.isOn()) {
       this.loadModule(kw.stateDrawParabolaHandlers);
     }
     else {
       this.reset();
     }
+
+    return true;
   },
 
-  toggleColorBlue: function(whichButton) {
-
+  toggleColorBlue: function(x, y) {
+    return true;
   },
 
-  toggleColorGreen: function(whichButton) {
-
+  toggleColorGreen: function(x, y) {
+    return true;
   },
 
-  toggleColorYellow: function(whichButton) {
-
+  toggleColorYellow: function(x, y) {
+    return true;
   },
 
-  toggleColorRed: function(whichButton) {
+  toggleColorRed: function(x, y) {
+    return true;
+  },
 
+  deleteElement: function(x, y) {
+    return true;
   },
 
   // Toggle Button Custom Draw Routines ///////////////////////////////////////

@@ -37,6 +37,7 @@ kw.problem = new joe.ClassEx(
           metrics     = null,
           bestString  = null,
           bAddWord    = false;
+          description = [];
 
       for (i=0, testString=words[0]; i<wordCount; ++i) {
         metrics = this.font.measureText(testString, this.TEXT_SIZE);
@@ -46,13 +47,13 @@ kw.problem = new joe.ClassEx(
           if (!bestString) {
             // ERROR: a single token is too large to fit onscreen.
             // Communicate the problem and exit the loop.
-            this.description.push(kw.strings.MALFORMED_DESCRIPTION);
+            description.push(kw.strings.MALFORMED_DESCRIPTION);
             break;
           }
           else {
             // Insert this line into the description and start over
             // with a fresh line.
-            this.description.push(bestString);
+            description.push(bestString);
             bestString = null;
             testString = words[i] + " ";
             bAddWord = true;
@@ -74,23 +75,41 @@ kw.problem = new joe.ClassEx(
       if (bestString) {
         metrics = this.font.measureText(bestString, this.TEXT_SIZE);
         if (metrics.bounds.maxx - metrics.bounds.minx <= kw.GAME_WIDTH - 2 * this.DESCRIPTION_MARGIN_X) {
-          this.description.push(bestString);
+          description.push(bestString);
         }
       }
 
       // Now that we have full description text,
       // we can generate Labels for the GUI.
-      for (i=0; i<this.description.length; ++i) {
+      for (i=0; i<description.length; ++i) {
         // Replace the text with equivalent labels.
-        this.description[i] = new joe.GUI.Label(this.description[i],
-                                                this.font,
-                                                this.color,
-                                                this.TEXT_SIZE,
-                                                kw.GAME_WIDTH / 2,
-                                                kw.GAME_HEIGHT / 2 / 2 - this.description.length * this.TEXT_SIZE / 2 + i * this.TEXT_SIZE,
-                                                0.5,
-                                                0.5);
+        description[i] = new joe.GUI.Label(description[i],
+                                           this.font,
+                                           this.color,
+                                           this.TEXT_SIZE,
+                                           kw.GAME_WIDTH / 2,
+                                           kw.GAME_HEIGHT * 3 / 4 - description.length * this.TEXT_SIZE / 2 + i * this.TEXT_SIZE,
+                                           null,
+                                           0.5,
+                                           0.5);
+      }
+
+      return description;
+    },
+
+    showText: function() {
+      var i = 0;
+
+      for (i=0; i<this.description.length; ++i) {
         joe.GUI.addWidget(this.description[i]);
+      }
+    },
+
+    hideText: function() {
+      var i = 0;
+
+      for (i=0; i<this.description.length; ++i) {
+        joe.GUI.removeWidget(this.description[i]);
       }
     },
 

@@ -7,6 +7,8 @@ var kw = {
   DRAW_COLOR_YELLOW: "#ffff00",
   DRAW_COLOR_BLUE: "#4444ff",
   DRAW_COLOR_LIGHT_BLUE: "#6699ff",
+
+  DEFAULT_TEXT_SIZE: 30,
 };
 
 
