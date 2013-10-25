@@ -88,6 +88,7 @@ kw.problem = new joe.ClassEx(
                                                 this.TEXT_SIZE,
                                                 kw.GAME_WIDTH / 2,
                                                 kw.GAME_HEIGHT / 2 / 2 - this.description.length * this.TEXT_SIZE / 2 + i * this.TEXT_SIZE,
+                                                null,
                                                 0.5,
                                                 0.5);
         joe.GUI.addWidget(this.description[i]);

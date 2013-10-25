@@ -85,7 +85,8 @@ KinWizMain = ig.Game.extend({
     // TODO: update resource count.
     this.font = font;
 
-    this.setState(new StateShowProblem(new kw.problem(this.font, kw.DRAW_COLOR_LIGHT_BLUE, kw.strings.SAMPLE_PROBLEM_TEXT)));
+    // this.setState(new StateShowProblem(new kw.problem(this.font, kw.DRAW_COLOR_LIGHT_BLUE, kw.strings.SAMPLE_PROBLEM_TEXT)));
+    this.setState(new StateDrawProblem(this.font));
   },
   
   init: function() {

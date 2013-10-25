@@ -15,15 +15,15 @@ kw.drawProblemGUIhandlers = {
 
   // Toggle Button Callbacks //////////////////////////////////////////////////
   // These functions are executed in the context of the button.
-  toggleLineMode: function(whichButton) {
+  toggleLineMode: function(x, y) {
 
   },
 
-  toggleVectorMode: function(whichButton) {
+  toggleVectorMode: function(x, y) {
 
   },
 
-  toggleArcMode: function(whichButton) {
+  toggleArcMode: function(x, y) {
     if (whichButton && whichButton.isOn()) {
       this.loadModule(kw.stateDrawParabolaHandlers);
     }
@@ -32,19 +32,23 @@ kw.drawProblemGUIhandlers = {
     }
   },
 
-  toggleColorBlue: function(whichButton) {
+  toggleColorBlue: function(x, y) {
 
   },
 
-  toggleColorGreen: function(whichButton) {
+  toggleColorGreen: function(x, y) {
 
   },
 
-  toggleColorYellow: function(whichButton) {
+  toggleColorYellow: function(x, y) {
 
   },
 
-  toggleColorRed: function(whichButton) {
+  toggleColorRed: function(x, y) {
+
+  },
+
+  deleteSelected: function(x, y) {
 
   },
 
