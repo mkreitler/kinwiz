@@ -79,6 +79,7 @@ KinWizMain = ig.Game.extend({
 //  testExpression: "1 + (x / 2) = (x / 3)",
 
   curState: null,
+  problem: null,
   problems: [],
   drawState: null,
   showState: null,
@@ -87,10 +88,13 @@ KinWizMain = ig.Game.extend({
     // TODO: update resource count.
     this.font = font;
 
-    this.showState = new StateShowProblem(new kw.problem(this.font, kw.DRAW_COLOR_LIGHT_BLUE, kw.strings.SAMPLE_PROBLEM_TEXT),
+    this.problem = new kw.problem(this.font, kw.DRAW_COLOR_LIGHT_BLUE, kw.strings.SAMPLE_PROBLEM_TEXT);
+    
+    this.showState = new StateShowProblem(this.problem,
                                           this.font,
-                                          {mouseDown: this.drawProblem.bind(this)});
-    this.drawState = new StateDrawProblem(this.font, {mouseDown: function() {console.log("Advance to next state...")}});
+                                          {mouseDown: this.drawProblem.bind(this)} );
+
+    this.drawState = new StateDrawProblem(this.problem, this.font, {mouseDown: (function() {console.log("Advance to next state...")}).bind(this) });
 
     this.setState(this.showState);
   },

@@ -12,7 +12,7 @@
   DRAW_INSTRUCTIONS: [
     "Step One: Draw a Diagram",
     "Select tools on the left",
-    "Draw in the box below",
-    "Tap here when done"
+    "Tap here to start drawing",
+    "Tap 'done' when done"
   ]
  };

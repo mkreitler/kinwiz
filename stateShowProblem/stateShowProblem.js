@@ -14,7 +14,7 @@ ig.module(
     labelNextStep: null,
     labelTapHere: null,
 
-    init: function(problem, font, inputHandler) {
+    init: function(problem, font, inputCallbacks) {
       this.problem = problem;
       this.labelNextStep = new joe.GUI.Label(kw.strings.SHOW_PROBLEM,
                                              font,
@@ -22,7 +22,7 @@ ig.module(
                                              kw.DEFAULT_TEXT_SIZE,
                                              kw.GAME_WIDTH / 2,
                                              kw.GAME_HEIGHT * 1 / 4 - kw.DEFAULT_TEXT_SIZE / 2,
-                                             inputHandler,
+                                             inputCallbacks,
                                              0.5,
                                              0.5);
 
@@ -32,7 +32,7 @@ ig.module(
                                             kw.DEFAULT_TEXT_SIZE,
                                             kw.GAME_WIDTH / 2,
                                             kw.GAME_HEIGHT * 1 / 4 - kw.DEFAULT_TEXT_SIZE / 2 + kw.DEFAULT_TEXT_SIZE,
-                                            inputHandler,
+                                            inputCallbacks,
                                             0.5,
                                             0.5);
     },

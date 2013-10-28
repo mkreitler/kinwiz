@@ -97,18 +97,24 @@ kw.problem = new joe.ClassEx(
       return description;
     },
 
-    showText: function() {
+    showText: function(offsetX, offsetY) {
       var i = 0;
+      var dx = offsetX || 0;
+      var dy = offsetY || 0;
 
       for (i=0; i<this.description.length; ++i) {
+        this.description[i].AABBoffset(dx, dy);
         joe.GUI.addWidget(this.description[i]);
       }
     },
 
-    hideText: function() {
+    hideText: function(offsetX, offsetY) {
       var i = 0;
+      var dx = offsetX || 0;
+      var dy = offsetY || 0;
 
       for (i=0; i<this.description.length; ++i) {
+        this.description[i].AABBoffset(dx, dy);
         joe.GUI.removeWidget(this.description[i]);
       }
     },

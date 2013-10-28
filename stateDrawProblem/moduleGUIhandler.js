@@ -18,8 +18,7 @@ kw.drawProblemGUIhandlers = {
     this.diagramBox.widgetRemoveChild(this.labelDiagram);
 
     // Set up normal draw input handler.
-    this.subState = "none";
-    this.diagramBox.inputHandlers = this.SUB_STATE[this.subState];
+    this.diagramBox.inputCallbacks.mouseUp = this.continueDrawing.bind(this);
 
     return true;
   },
@@ -41,7 +40,7 @@ kw.drawProblemGUIhandlers = {
   },
 
   toggleArcMode: function(x, y) {
-    if (whichButton && whichButton.isOn()) {
+    if (this.modeBoxes[2].isOn()) {
       this.loadModule(kw.stateDrawParabolaHandlers);
     }
     else {

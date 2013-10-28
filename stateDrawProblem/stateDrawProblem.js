@@ -16,14 +16,7 @@ StateDrawProblem = state.extend({
   COLORBAR_GROUP_ID: 2,
   TOOLBAR_GROUP_ID: 3,
 
-  SUB_STATE: {
-    none: null,
-    intro: null,
-    drawLine: null,
-    drawVector: null,
-    drawParabola: null 
-  },
-
+  problem: null,
 	font: null,
 
   modeBoxes: null, 
@@ -31,18 +24,20 @@ StateDrawProblem = state.extend({
   toolBoxes: null,
   diagramBox: null,
 
-  subState: "intro",
   drawRegion: null,
 
   labelDiagram: null,
   instructions: [],
+  defaultDiagramBoxInputCallbacks: null,
 
-	init: function(sysFont, instInputHandler) {
+	init: function(problem, sysFont, instInputHandler) {
     var boxX      = 0,
         boxY      = 0,
         boxDx     = 0,
         boxDy     = 0,
         i         = 0;
+
+    this.problem = problem;
 
     // Initialize code modules ------------------------------------------------
     // Inherited...
@@ -50,23 +45,23 @@ StateDrawProblem = state.extend({
 
     // ...and local.
     this.loadModule(kw.drawProblemGUIhandlers);
-    this.SUB_STATE.intro = {mouseUp: this.startDrawing.bind(this)};
-    this.SUB_STATE.none = {mouseUp: this.continueDrawing.bind(this)};
-    this.SUB_STATE.drawLine = null;
-    this.SUB_STATE.drawVector = null;
-    this.SUB_STATE.drawParabola = null;
 
     this.font = sysFont;
 
     this.drawRegion = new joe.MathEx.AABB(100, 10, kw.GAME_WIDTH - 110, Math.round(kw.GAME_HEIGHT / 2 - 20));
+
+    boxDx = kw.GAME_WIDTH - 110;
+    boxDy = Math.round(kw.GAME_HEIGHT / 2 - 20);
+    boxX = 100;
+    boxY = kw.GAME_HEIGHT - 10 - boxDy;
 
     for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
       this.instructions.push(new joe.GUI.Label(kw.strings.DRAW_INSTRUCTIONS[i],
                                                this.font,
                                                kw.DRAW_COLOR_YELLOW,
                                                kw.DEFAULT_TEXT_SIZE,
-                                               kw.GAME_WIDTH / 2,
-                                               kw.GAME_HEIGHT * 1 / 4 + kw.DEFAULT_TEXT_SIZE * (i - Math.round(kw.strings.DRAW_INSTRUCTIONS.length / 2)),
+                                               Math.round(boxDx / 2),
+                                               Math.round(boxDy / 2 + (i - Math.round(kw.strings.DRAW_INSTRUCTIONS.length / 2)) * kw.DEFAULT_TEXT_SIZE + kw.DEFAULT_TEXT_SIZE * 0.5),
                                                instInputHandler,
                                                0.5,
                                                0.5));
@@ -89,26 +84,19 @@ StateDrawProblem = state.extend({
       new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, {mouseUp: this.deleteElement.bind(this)}, this.deleteToolDraw),
     ];
 
-    boxDx = kw.GAME_WIDTH - 110;
-    boxDy = Math.round(kw.GAME_HEIGHT / 2 - 20);
-    boxX = 100;
-    boxY = kw.GAME_HEIGHT - 10 - boxDy;
+    this.defaultDiagramBoxInputCallbacks = {mouseUp: this.startDrawing.bind(this)};
 
-    this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", kw.DEFAULT_TEXT_SIZE, Math.round(boxDx * 0.5), Math.round(boxDy * 0.5), null, 0.5, 0.5);
-    this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.SUB_STATE[this.subState], this.diagramDraw);
-    this.diagramBox.widgetAddChild(this.labelDiagram);
+    this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.defaultDiagramBoxInputcallbacks, this.diagramDraw);
+    // this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", kw.DEFAULT_TEXT_SIZE, Math.round(boxDx * 0.5), Math.round(boxDy * 0.5), null, 0.5, 0.5);
+    // this.diagramBox.widgetAddChild(this.labelDiagram);
 	},
-
-  defaultDiagramBoxInputHandler:
-  {
-    mouseUp: null,
-  },
 
   enter: function() {
     var i = 0;
 
+    // Add interface elements.
     for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
-      joe.GUI.addWidget(this.instructions[i]);
+      this.diagramBox.widgetAddChild(this.instructions[i]);
     }
 
     for (i=0; i<this.modeBoxes.length; ++i) {
@@ -123,14 +111,22 @@ StateDrawProblem = state.extend({
       joe.GUI.addWidget(this.toolBoxes[i]);
     }
 
+    this.problem.showText(55, -Math.round(kw.GAME_HEIGHT * 0.5));
+
     joe.GUI.addWidget(this.diagramBox);
+
+    // Set initial state.    
+    this.diagramBox.widgetSetInputCallbacks(this.defaultDiagramBoxInputCallbacks);
   },
 
   exit: function() {
     var i = 0;
 
+    this.problem.hideText(-55, Math.round(kw.GAME_HEIGHT * 0.5));
+
+    // Remove interface elements.
     for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
-      joe.GUI.removeWidget(this.instructions[i]);
+      this.diagramBox.widgetRemoveChild(this.instructions[i]);
     }
 
     for (i=0; i<this.modeBoxes.length; ++i) {
