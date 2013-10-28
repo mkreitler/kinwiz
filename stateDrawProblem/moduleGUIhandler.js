@@ -18,8 +18,8 @@ kw.drawProblemGUIhandlers = {
     this.diagramBox.widgetRemoveChild(this.labelDiagram);
 
     // Set up normal draw input handler.
-    this.diagramBox.inputHandlers.mouseUp = this.continueDrawing.bind(this);
-    this.continueDrawing(x, y);
+    this.subState = "none";
+    this.diagramBox.inputHandlers = this.SUB_STATE[this.subState];
 
     return true;
   },

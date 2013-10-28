@@ -16,6 +16,14 @@ StateDrawProblem = state.extend({
   COLORBAR_GROUP_ID: 2,
   TOOLBAR_GROUP_ID: 3,
 
+  SUB_STATE: {
+    none: null,
+    intro: null,
+    drawLine: null,
+    drawVector: null,
+    drawParabola: null 
+  },
+
 	font: null,
 
   modeBoxes: null, 
@@ -23,7 +31,7 @@ StateDrawProblem = state.extend({
   toolBoxes: null,
   diagramBox: null,
 
-  subState: null,
+  subState: "intro",
   drawRegion: null,
 
   labelDiagram: null,
@@ -42,7 +50,11 @@ StateDrawProblem = state.extend({
 
     // ...and local.
     this.loadModule(kw.drawProblemGUIhandlers);
-    this.defaultDiagramBoxInputHandler.mouseUp = this.startDrawing.bind(this);
+    this.SUB_STATE.intro = {mouseUp: this.startDrawing.bind(this)};
+    this.SUB_STATE.none = {mouseUp: this.continueDrawing.bind(this)};
+    this.SUB_STATE.drawLine = null;
+    this.SUB_STATE.drawVector = null;
+    this.SUB_STATE.drawParabola = null;
 
     this.font = sysFont;
 
@@ -83,7 +95,7 @@ StateDrawProblem = state.extend({
     boxY = kw.GAME_HEIGHT - 10 - boxDy;
 
     this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", kw.DEFAULT_TEXT_SIZE, Math.round(boxDx * 0.5), Math.round(boxDy * 0.5), null, 0.5, 0.5);
-    this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.defaultDiagramBoxInputHandler, this.diagramDraw);
+    this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.SUB_STATE[this.subState], this.diagramDraw);
     this.diagramBox.widgetAddChild(this.labelDiagram);
 	},
 
@@ -161,9 +173,6 @@ StateDrawProblem = state.extend({
 	// },
 
   update: function(dt) {
-    if (this.subState) {
-      this.subState.update(dt);
-    }
   },
 
   draw: function() {
