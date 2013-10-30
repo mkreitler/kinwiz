@@ -7,18 +7,7 @@ ig.module(
 .defines(function(){
 
   state = ig.Class.extend({
-    defaultState: {
-      mouseUp: function(x, y) {return true;},
-      mouseDown: function(x, y) {return true;},
-      mouseDrag: function(x, y) {return true;},
-      mouseOver: function(x, y) {return true;},
-      mouseHold: function(x, y) {return true;},
-      mouseClick: function(x, y) {return true;},
-      mouseDoubleClick: function(x, y) {return true;}
-    },
-
     init: function() {
-      this.reset();
     },
 
     // loadModule allows us to swap one set of methods for another.
@@ -30,8 +19,32 @@ ig.module(
       }
     },  
     
-    reset: function() {
-      this.loadModule(this.defaultState);
+    mouseUp: function(x, y) {
+      return true;
+    },
+
+    mouseDown: function(x, y) {
+      return true;
+    },
+
+    mouseDrag: function(x, y) {
+      return true;
+    },
+
+    mouseOver: function(x, y) {
+      return true;
+    },
+
+    mouseHold: function(x, y) {
+      return true;
+    },
+
+    mouseClick: function(x, y) {
+      return true;
+    },
+
+    mouseDoubleClick: function(x, y) {
+      return true;
     },
 
     enter: function() {

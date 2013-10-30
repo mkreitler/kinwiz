@@ -18,6 +18,16 @@ kw.drawProblemGUIhandlers = {
     this.diagramBox.widgetRemoveChild(this.labelDiagram);
 
     // Set up normal draw input handler.
+    this.setDiagramBoxStateNone();
+    this.hideInstructions();
+    this.setWidgetsActive(true);
+
+    this.diagramBox.widgetAddChild(this.labelDone);
+
+    return true;
+  },
+
+  setDiagramBoxStateNone: function() {
     this.diagramBox.inputCallbacks = {
       mouseUp: this.noop.bind(this),
       mouseDown: this.noop.bind(this),
@@ -27,13 +37,6 @@ kw.drawProblemGUIhandlers = {
       mouseClick: this.noop.bind(this),
       mouseDoubleClick: this.noop.bind(this),
     }
-
-    this.hideInstructions();
-    this.setWidgetsActive(true);
-
-    this.diagramBox.widgetAddChild(this.labelDone);
-
-    return true;
   },
 
   noop: function(x, y) {
@@ -44,17 +47,25 @@ kw.drawProblemGUIhandlers = {
 
   // Toggle Button Callbacks //////////////////////////////////////////////////
   // These functions are executed in the context of the button.
-  toggleLineMode: function(x, y) {
+  toggleLineMode: function(x, y, widget) {
     return true;
   },
 
-  toggleVectorMode: function(x, y) {
+  toggleVectorMode: function(x, y, widget) {
     return true;
   },
 
   toggleArcMode: function(x, y, widget) {
     if (widget.isOn()) {
-      this.loadModule(kw.stateDrawParabolaHandlers);
+      this.diagramBox.inputCallbacks = {
+        mouseUp: kw.stateDrawParabolaHandlers.mouseUp.bind(this),
+        mouseDown: kw.stateDrawParabolaHandlers.mouseDown.bind(this),
+        mouseDrag: kw.stateDrawParabolaHandlers.mouseDrag.bind(this),
+        mouseOver: kw.stateDrawParabolaHandlers.mouseOver.bind(this),
+        mouseHold: kw.stateDrawParabolaHandlers.mouseHold.bind(this),
+        mouseClick: kw.stateDrawParabolaHandlers.mouseClick.bind(this),
+        mouseDoubleClick: kw.stateDrawParabolaHandlers.mouseDoubleClick.bind(this)
+      }
     }
     else {
       this.reset();
@@ -63,23 +74,23 @@ kw.drawProblemGUIhandlers = {
     return true;
   },
 
-  toggleColorBlue: function(x, y) {
+  toggleColorBlue: function(x, y, widget) {
     return true;
   },
 
-  toggleColorGreen: function(x, y) {
+  toggleColorGreen: function(x, y, widget) {
     return true;
   },
 
-  toggleColorYellow: function(x, y) {
+  toggleColorYellow: function(x, y, widget) {
     return true;
   },
 
-  toggleColorRed: function(x, y) {
+  toggleColorRed: function(x, y, widget) {
     return true;
   },
 
-  deleteElement: function(x, y) {
+  deleteElement: function(x, y, widget) {
     return true;
   },
 
