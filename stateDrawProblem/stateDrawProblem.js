@@ -27,6 +27,7 @@ StateDrawProblem = state.extend({
   drawRegion: null,
 
   labelDiagram: null,
+  labelDone: null,
   instructions: [],
   defaultDiagramBoxInputCallbacks: null,
 
@@ -55,6 +56,8 @@ StateDrawProblem = state.extend({
     boxX = 100;
     boxY = kw.GAME_HEIGHT - 10 - boxDy;
 
+    this.defaultDiagramBoxInputCallbacks = {mouseUp: this.startDrawing.bind(this)};
+
     for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
       this.instructions.push(new joe.GUI.Label(kw.strings.DRAW_INSTRUCTIONS[i],
                                                this.font,
@@ -62,7 +65,7 @@ StateDrawProblem = state.extend({
                                                kw.DEFAULT_TEXT_SIZE,
                                                Math.round(boxDx / 2),
                                                Math.round(boxDy / 2 + (i - Math.round(kw.strings.DRAW_INSTRUCTIONS.length / 2)) * kw.DEFAULT_TEXT_SIZE + kw.DEFAULT_TEXT_SIZE * 0.5),
-                                               instInputHandler,
+                                               this.defaultDiagramBoxInputCallbacks,
                                                0.5,
                                                0.5));
     }
@@ -84,20 +87,23 @@ StateDrawProblem = state.extend({
       new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, {mouseUp: this.deleteElement.bind(this)}, this.deleteToolDraw),
     ];
 
-    this.defaultDiagramBoxInputCallbacks = {mouseUp: this.startDrawing.bind(this)};
-
     this.diagramBox = new joe.GUI.CaptureBox(boxX, boxY, boxDx, boxDy, "#ffffff", "#777777", this.defaultDiagramBoxInputcallbacks, this.diagramDraw);
     // this.labelDiagram = new joe.GUI.Label(kw.strings.DIAGRAM, sysFont, "#aaaaaa", kw.DEFAULT_TEXT_SIZE, Math.round(boxDx * 0.5), Math.round(boxDy * 0.5), null, 0.5, 0.5);
     // this.diagramBox.widgetAddChild(this.labelDiagram);
+
+    this.labelDone = new joe.GUI.Label(kw.strings.DONE,
+                                       this.font,
+                                       kw.DRAW_COLOR_YELLOW,
+                                       kw.DEFAULT_TEXT_SIZE,
+                                       boxDx,
+                                       boxDy,
+                                       instInputHandler,
+                                       1,
+                                       1);
 	},
 
-  enter: function() {
+  addWidgets: function() {
     var i = 0;
-
-    // Add interface elements.
-    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
-      this.diagramBox.widgetAddChild(this.instructions[i]);
-    }
 
     for (i=0; i<this.modeBoxes.length; ++i) {
       joe.GUI.addWidget(this.modeBoxes[i]);
@@ -111,22 +117,30 @@ StateDrawProblem = state.extend({
       joe.GUI.addWidget(this.toolBoxes[i]);
     }
 
-    this.problem.showText(55, -Math.round(kw.GAME_HEIGHT * 0.5));
-
-    joe.GUI.addWidget(this.diagramBox);
-
-    // Set initial state.    
-    this.diagramBox.widgetSetInputCallbacks(this.defaultDiagramBoxInputCallbacks);
+    this.setWidgetsActive(false);
   },
 
-  exit: function() {
+  setWidgetsActive: function(bActive) {
     var i = 0;
 
-    this.problem.hideText(-55, Math.round(kw.GAME_HEIGHT * 0.5));
+    for (i=0; i<this.modeBoxes.length; ++i) {
+      this.modeBoxes[i].widgetSetActive(bActive);
+    }
 
-    // Remove interface elements.
-    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
-      this.diagramBox.widgetRemoveChild(this.instructions[i]);
+    for (i=0; i<this.colorBoxes.length; ++i) {
+      this.colorBoxes[i].widgetSetActive(bActive);
+    }
+
+    for (i=0; i<this.toolBoxes.length; ++i) {
+      this.toolBoxes[i].widgetSetActive(bActive);
+    }
+  },
+
+  removeWidgets: function() {
+    var i = 0;
+
+    for (i=0; i<this.toolBoxes.length; ++i) {
+      joe.GUI.removeWidget(this.toolBoxes[i]);
     }
 
     for (i=0; i<this.modeBoxes.length; ++i) {
@@ -136,10 +150,41 @@ StateDrawProblem = state.extend({
     for (i=0; i<this.colorBoxes.length; ++i) {
       joe.GUI.removeWidget(this.colorBoxes[i]);
     }
+  },
 
-    for (i=0; i<this.toolBoxes.length; ++i) {
-      joe.GUI.removeWidget(this.toolBoxes[i]);
+  showInstructions: function() {
+    var i = 0;
+    
+    // Add instructions and problem text.
+    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
+      this.diagramBox.widgetAddChild(this.instructions[i]);
     }
+  },
+
+  hideInstructions: function() {
+    var i = 0;
+
+    for (i=0; i<kw.strings.DRAW_INSTRUCTIONS.length; ++i) {
+      this.diagramBox.widgetRemoveChild(this.instructions[i]);
+    }
+  },
+
+  enter: function() {
+    this.showInstructions();
+    this.setWidgetsActive(false);
+    this.addWidgets();
+
+    this.problem.showText(55, -Math.round(kw.GAME_HEIGHT * 0.5));
+    joe.GUI.addWidget(this.diagramBox);
+
+    // Set initial state.    
+    this.diagramBox.widgetSetInputCallbacks(this.defaultDiagramBoxInputCallbacks);
+  },
+
+  exit: function() {
+    this.problem.hideText(-55, Math.round(kw.GAME_HEIGHT * 0.5));
+    this.removeWidgets();
+    this.removeInstructions();
 
     joe.GUI.removeWidget(this.diagramBox);
   },

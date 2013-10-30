@@ -18,13 +18,26 @@ kw.drawProblemGUIhandlers = {
     this.diagramBox.widgetRemoveChild(this.labelDiagram);
 
     // Set up normal draw input handler.
-    this.diagramBox.inputCallbacks.mouseUp = this.continueDrawing.bind(this);
+    this.diagramBox.inputCallbacks = {
+      mouseUp: this.noop.bind(this),
+      mouseDown: this.noop.bind(this),
+      mouseDrag: this.noop.bind(this),
+      mouseOver: this.noop.bind(this),
+      mouseHold: this.noop.bind(this),
+      mouseClick: this.noop.bind(this),
+      mouseDoubleClick: this.noop.bind(this),
+    }
+
+    this.hideInstructions();
+    this.setWidgetsActive(true);
+
+    this.diagramBox.widgetAddChild(this.labelDone);
 
     return true;
   },
 
-  continueDrawing: function(x, y) {
-    console.log("Continue drawing...");
+  noop: function(x, y) {
+    console.log("No tool selected.");
 
     return true;
   },
@@ -39,8 +52,8 @@ kw.drawProblemGUIhandlers = {
     return true;
   },
 
-  toggleArcMode: function(x, y) {
-    if (this.modeBoxes[2].isOn()) {
+  toggleArcMode: function(x, y, widget) {
+    if (widget.isOn()) {
       this.loadModule(kw.stateDrawParabolaHandlers);
     }
     else {
