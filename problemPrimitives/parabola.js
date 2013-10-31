@@ -29,12 +29,16 @@
       }
     },
 
+    getNumberOfPoints: function() {
+      return this.points.length;
+    },
+
     // Valid points in a two dimensional function cannot share x coordinates.
     pointIsValid: function(x, y) {
       var i = 0,
           bValid = true;
 
-      for (i=0; i<this.points.length) {
+      for (i=0; i<this.points.length; ++i) {
         if (x === this.points[i].x) {
           bValid = false;
           break;

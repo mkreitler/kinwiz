@@ -18,6 +18,7 @@ StateDrawProblem = state.extend({
 
   problem: null,
 	font: null,
+  primitives: [],
 
   modeBoxes: null, 
   colorBoxes: null,

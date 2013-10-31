@@ -11,6 +11,19 @@ kw.stateDrawParabolaHandlers = {
   },
 
   mouseDown: function(x, y, widget) {
+    var curShape = this.primitives.length ? this.primitives[this.primitives.length - 1] : null;
+
+    if (!curShape) {
+      // Create a new parabola object.
+      this.curShape = new kw.Parabola();
+    }
+
+    if (this.curShape instanceof kw.Parabola) {
+      if (this.curShape.getNumberOfPoints() < 3) {
+        this.curShape.addPoint(x, y);
+      }
+    }
+
     console.log("DrawParabola mouseDown");
     return true;
   },
