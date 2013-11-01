@@ -65,7 +65,20 @@ kw.drawProblemGUIhandlers = {
         mouseHold: kw.stateDrawParabolaHandlers.mouseHold.bind(this),
         mouseClick: kw.stateDrawParabolaHandlers.mouseClick.bind(this),
         mouseDoubleClick: kw.stateDrawParabolaHandlers.mouseDoubleClick.bind(this)
-      }
+      };
+
+      this.toolBoxes[0].widgetSetInputCallbacks({
+        mouseUp: function(x, y, widget) {
+          var curParabola = kw.Parabola.getCurrentParabola();
+
+          if (curParabola) {
+            joe.Utility.erase(this.primitives, curParabola);
+            curParabola.delete();
+          }
+
+          return true;
+        }.bind(this)
+      });
     }
     else {
       this.reset();

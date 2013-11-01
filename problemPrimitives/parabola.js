@@ -126,7 +126,7 @@
       return this.curParabola;
     },
 
-    selectExistingParabola: function(x, y) {
+    getParabolaAtPoint: function(x, y) {
       var i = 0,
           prim = null,
           xIdeal = 0,
@@ -174,10 +174,6 @@
         }
       }
 
-      if (bestPrim) {
-        this.setCurrentParabola(bestPrim);
-      }
-
       return bestPrim;
     }
   },
@@ -194,6 +190,24 @@
       dragFunction: "dragParabola",
       dragStart: {x:0, y:0},
       color: null,
+      bIsNew: true,
+      bWantsUnselect: false,
+
+      completeCreation: function() {
+        this.bIsNew = false;
+      },
+
+      setWantsUnselect: function(bWantsUnselect) {
+        this.bWantsUnselect = bWantsUnselect;
+      },
+
+      wantsUnselect: function() {
+        return this.bWantsUnselect;
+      },
+
+      isNew: function() {
+        return this.bIsNew;
+      },
 
       isSelected: function() {
         return kw.Parabola.getCurrentParabola() === this;

@@ -6,14 +6,19 @@ kw.stateDrawParabolaHandlers = {
   // --------------------------------------------------------------------------
   // DrawParabola handlers:
   mouseUp: function(x, y, widget) {
-    var curShape = kw.Parabola.getCurrentParabola() ||
-                   kw.Parabola.selectExistingParabola(x,y);
+    var curShape = kw.Parabola.getCurrentParabola();
 
     if (curShape) {
-      curShape.setWantsDrag(false);
+      if (curShape.getNumberOfPoints() === 3 && curShape.isNew()) {
+        curShape.completeCreation();
+      }
 
-      if (curShape.getNumberOfPoints() === 3) {
+      if (curShape.wantsUnselect()) {
         kw.Parabola.setCurrentParabola(null);
+      }
+
+      if (curShape.wantsDrag()) {
+        curShape.setWantsDrag(false);
       }
     }
 
@@ -21,23 +26,49 @@ kw.stateDrawParabolaHandlers = {
   },
 
   mouseDown: function(x, y, widget) {
-    var curShape = kw.Parabola.getCurrentParabola() ||
-                   kw.Parabola.selectExistingParabola(x, y);
+    var curShape = kw.Parabola.getCurrentParabola();
+    var selShape = kw.Parabola.getParabolaAtPoint(x, y);
+    var bStartingNewShape = false;
+    var bBuildShape = false;
 
-    if (!curShape) {
-      // Create a new parabola object.
+    if (selShape) {
+      if (curShape === selShape) {
+        // Selected existing shape. Toggle selection.
+        curShape.setWantsUnselect(curShape.isSelected());
+        selShape.setWantsDrag(true);
+        selShape.setDragStart(x, y);
+      }
+      else if (curShape && curShape.isNew()) {
+        // Continue building the shape.
+        bBuildShape = true;
+      }
+      else {
+        // Selected a new or different parabola. Select the new one.
+        kw.Parabola.setCurrentParabola(selShape);
+        selShape.setWantsUnselect(false);
+        selShape.setWantsDrag(true);
+        selShape.setDragStart(x, y);
+      }
+    }
+    else {
+      // Didin't click on an existing parabola.
+      bBuildShape = true;
+      bStartingNewShape = !curShape;
+    }
+
+    if (bStartingNewShape) {
       curShape = new kw.Parabola(this.getCurrentColor());
       this.primitives.push(curShape);
     }
 
-    if (curShape) {
+    if (bBuildShape) {
       if (curShape.getNumberOfPoints() < 3) {
         curShape.addPoint(x, y);
       }
-      else {
-        curShape.setWantsDrag(true);
-        curShape.setDragStart(x, y);
-      }
+
+      curShape.setWantsUnselect(curShape.getNumberOfPoints() === 3);
+      curShape.setWantsDrag(false);
+      kw.Parabola.setCurrentParabola(curShape);
     }
 
     return true;
@@ -48,6 +79,9 @@ kw.stateDrawParabolaHandlers = {
 
     if (prim && prim.wantsDrag()) {
       kw.Parabola.drag[prim.getDragFunction()].call(prim, x, y);
+
+      // Dragging cancels selection detoggle.
+      prim.setWantsUnselect(false);
     }
 
     return true;
