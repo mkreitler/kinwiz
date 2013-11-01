@@ -56,7 +56,7 @@ ig.module(
     update: function(dt) {
     },
 
-    draw: function() {
+    draw: function(context) {
     }
   });
 

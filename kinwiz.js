@@ -200,7 +200,7 @@ KinWizMain = ig.Game.extend({
     }
     
     if (this.curState && !this.isAlgebra2active() && !this.isAlgebra2transitioning()) {   
-      this.curState.draw();
+      this.curState.draw(joe.Graphics.getActiveContext());
     }
 
     joe.Graphics.render();

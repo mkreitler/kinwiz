@@ -6,30 +6,50 @@ kw.stateDrawParabolaHandlers = {
   // --------------------------------------------------------------------------
   // DrawParabola handlers:
   mouseUp: function(x, y, widget) {
-    console.log("DrawParabola mouseUp");
+    var curShape = kw.Parabola.getCurrentParabola() ||
+                   kw.Parabola.selectExistingParabola(x,y);
+
+    if (curShape) {
+      curShape.setWantsDrag(false);
+
+      if (curShape.getNumberOfPoints() === 3) {
+        kw.Parabola.setCurrentParabola(null);
+      }
+    }
+
     return true;
   },
 
   mouseDown: function(x, y, widget) {
-    var curShape = this.primitives.length ? this.primitives[this.primitives.length - 1] : null;
+    var curShape = kw.Parabola.getCurrentParabola() ||
+                   kw.Parabola.selectExistingParabola(x, y);
 
     if (!curShape) {
       // Create a new parabola object.
-      this.curShape = new kw.Parabola();
+      curShape = new kw.Parabola(this.getCurrentColor());
+      this.primitives.push(curShape);
     }
 
-    if (this.curShape instanceof kw.Parabola) {
-      if (this.curShape.getNumberOfPoints() < 3) {
-        this.curShape.addPoint(x, y);
+    if (curShape) {
+      if (curShape.getNumberOfPoints() < 3) {
+        curShape.addPoint(x, y);
+      }
+      else {
+        curShape.setWantsDrag(true);
+        curShape.setDragStart(x, y);
       }
     }
 
-    console.log("DrawParabola mouseDown");
     return true;
   },
 
   mouseDrag: function(x, y, widget) {
-    console.log("DrawParabola mouseDrag");
+    var prim = kw.Parabola.getCurrentParabola();
+
+    if (prim && prim.wantsDrag()) {
+      kw.Parabola.drag[prim.getDragFunction()].call(prim, x, y);
+    }
+
     return true;
   },
 

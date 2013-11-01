@@ -78,11 +78,13 @@ StateDrawProblem = state.extend({
     ];
 
     this.colorBoxes = [
-      new joe.GUI.ToggleBox(10, 265, 32, 32, kw.DRAW_COLOR_BLUE, "#222277", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorBlue.bind(this)}, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 265, 32, 32, kw.DRAW_COLOR_GREEN, "#007700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorGreen.bind(this)}, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(10, 305, 32, 32, kw.DRAW_COLOR_YELLOW, "#777700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorYellow.bind(this)}, this.colorButtonDraw),
-      new joe.GUI.ToggleBox(50, 305, 32, 32, kw.DRAW_COLOR_RED, "#770000", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorRed.bind(this)}, this.colorButtonDraw),
+      new joe.GUI.ToggleBox(10, 265, 32, 32, kw.DRAW_COLOR_BLUE, "#222277", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorBlue.bind(this)}, this.colorButtonDraw, function() { return kw.DRAW_COLOR_BLUE; }),
+      new joe.GUI.ToggleBox(50, 265, 32, 32, kw.DRAW_COLOR_GREEN, "#007700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorGreen.bind(this)}, this.colorButtonDraw, function() { return kw.DRAW_COLOR_GREEN; }),
+      new joe.GUI.ToggleBox(10, 305, 32, 32, kw.DRAW_COLOR_YELLOW, "#777700", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorYellow.bind(this)}, this.colorButtonDraw, function() { return kw.DRAW_COLOR_YELLOW; }),
+      new joe.GUI.ToggleBox(50, 305, 32, 32, kw.DRAW_COLOR_RED, "#770000", this.COLORBAR_GROUP_ID, {mouseDown: this.toggleColorRed.bind(this)}, this.colorButtonDraw, function() { return kw.DRAW_COLOR_RED; }),
     ];
+
+    this.colorBoxes[0].toggle(true);
 
     this.toolBoxes = [
       new joe.GUI.ClickBox(10, 350, 75, 75, "#770000", kw.DRAW_COLOR_RED, {mouseUp: this.deleteElement.bind(this)}, this.deleteToolDraw),
@@ -102,6 +104,24 @@ StateDrawProblem = state.extend({
                                        1,
                                        1);
 	},
+
+  reset: function() {
+    this.diagramBox.inputCallbacks = this.defaultDiagramBoxInputcallbacks;
+  },
+
+  getCurrentColor: function() {
+    var i = 0,
+        curColor = kw.DRAW_COLOR_WHITE;
+
+    for (i=0; i<this.colorBoxes.length; ++i) {
+      if (this.colorBoxes[i].isOn()) {
+        curColor = this.colorBoxes[i].getValue();
+        break;
+      }
+    }
+
+    return curColor;
+  },
 
   addWidgets: function() {
     var i = 0;
@@ -217,7 +237,12 @@ StateDrawProblem = state.extend({
   update: function(dt) {
   },
 
-  draw: function() {
+  draw: function(context) {
+    var i = 0;
+
+    for (i=0; i<this.primitives.length; ++i) {
+      this.primitives[i].draw(context);
+    }
   }
 });
 
